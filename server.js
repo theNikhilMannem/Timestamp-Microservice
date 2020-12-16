@@ -4,7 +4,7 @@
 // init project
 var express = require('express');
 var app = express();
-let includeMyApp = require('./myApp.js')
+// let includeMyApp = require('./myApp.js')
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC 
@@ -25,17 +25,39 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
-app.route("/api/timestamp/:date")
-.get((req, res) => {
-  console.log("GET of timestamp!")
-  console.log(req.params)
+app.get("/api/timestamp", (req, res) => {
+  const date = new Date()
   res.json({
-    unix: req.params.date,
-    utc: req.params.date
+    unix: date.getTime(),
+    utc: date.toUTCString()
   })
 })
-.post((req, res) => {
-  console.log("POST of timestamp!")
+
+app.get("/api/timestamp/:date", (req, res) => {
+  const { date } = req.params;
+  
+  let dateObj = new Date(date)
+
+  if (dateObj.toString() !== "Invalid Date") {
+    res.json({
+      unix: dateObj.getTime(),
+      utc: dateObj.toUTCString()
+    })
+  }
+  else {
+    if (parseInt(date)) {
+      dateObj = new Date(parseInt(date))
+      res.json({
+        unix: dateObj.getTime(),
+        utc: dateObj.toUTCString()
+      })
+    }
+    else {
+      res.json({
+        error: "Invalid Date"
+      })
+    }
+  }
 })
 
 // listen for requests :)
